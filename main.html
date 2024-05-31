@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartoonify Image</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        img { max-width: 100%; height: auto; margin-top: 20px; }
+        #head{color: rgb(150, 93, 145);}
+    </style>
+</head>
+<body>
+    <h1 id="head">Cartoonify Image</h1>
+    <input type="file" id="upload" accept="image/*">
+    <button id="process">Cartoonify</button>
+    <div>
+        <h3 id="head">Original Image:</h3>
+        <img id="original" src="" alt="Original Image">
+    </div>
+    <div>
+        <h3 id="head">Cartoonified Image:</h3>
+        <img id="cartoon" src="" alt="Cartoonified Image">
+    </div>
+
+    <script>
+        const Input = document.getElementById('upload');
+        const process = document.getElementById('process');
+        const originalimage = document.getElementById('original');
+        const cartoonimage = document.getElementById('cartoon');
+
+        let uploadedimage = null;
+
+        Input.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader(); //FileReader object is created to read the content of the file asynchronously.
+            reader.onload = function(e) { //The onload event of the FileReader is set to a function that will be called when the file reading operation is complete.
+                // (e.target.result) contains the data URL of the file (a Base64 encoded string representing the file's contents).
+                originalimage.src = e.target.result; 
+                uploadedimage = e.target.result;
+                console.log(uploadedimage)
+            };
+            reader.readAsDataURL(file); //This reads the file as a data URL
+        });
+
+        process.addEventListener('click', function() {
+            if (uploadedimage) {
+                fetch('http://127.0.0.1:5000/cartoonify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: uploadedimage})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    cartoonimage.src = data.cartoonified_image;
+                })
+                .catch(error => {
+                   console.log('Error:', error);
+                });
+            } else {
+                alert('Please upload an image first.');
+            }
+        });
+    </script>
+</body>
+</html>
