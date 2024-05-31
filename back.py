@@ -54,8 +54,10 @@ def cartoonify():
         image_data = data['image'].split(",")[1]
 
         image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+       
 
         cartoonified_image = cartoonify_image(image)
+
 
         _, buffer = cv2.imencode('.png', cartoonified_image)
         cartoonified_image_str = base64.b64encode(buffer).decode('utf-8')
